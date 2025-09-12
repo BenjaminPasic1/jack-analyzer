@@ -28,6 +28,47 @@ int has_next_line(FILE *file){
     return 1;
 }
 
+int has_next_token(char **current_line){
+
+    if(**current_line == '\0'){
+	return 0;
+    }
+
+    return 1;
+}
+
+char *get_next_token(char **current_line){
+    char *start, *end;
+    size_t len;
+
+    start = *current_line;
+
+    while(**current_line && !isspace((unsigned char)**current_line)){
+	(*current_line)++;
+    }
+    
+    end = *current_line;
+    len = end - start; 
+
+    char *token = malloc(len + 1);
+    if(!token){
+	perror("ERROR: Failed to allocate memory for token.");
+	exit(EXIT_FAILURE);
+    }
+
+    memcpy(token, start, len);
+    token[len] = '\0';
+    
+    //At this point, if we are mid line current_line points to an empty space,
+    //Here we skip any remaning spaces between tokens.
+    while(**current_line && isspace((unsigned char)**current_line)){
+	(*current_line)++;
+    }
+
+
+    return token;
+}
+
 char *get_next_line(FILE *file){
     char *line = malloc(MAX_BUFFER_SIZE);
     
