@@ -17,6 +17,18 @@ FILE *open_file(char *filename){
     return file;
 }
 
+FILE *generate_token_output_file(){
+    FILE *out_file = fopen("token_output.txt", "w");
+
+    if(out_file == NULL){
+	perror("ERROR: Error creating token outut file! Exiting...\n");
+	exit(EXIT_FAILURE);
+    }
+
+    return out_file;
+}
+
+
 
 HashMap *generate_token_hashmap() {
     HashMap *map = create_hashmap(HASHMAP_SIZE);
@@ -94,7 +106,8 @@ char *get_next_token(char **current_line, HashMap *jack_tokens){
     //if there are multiple spaces, or the pointer is left on a space -> skip
     while(**current_line == ' ')
 	(*current_line)++;
-
+    
+    //If it's a string, grab it
     if(**current_line == '"'){
 	token[len++] = **current_line;
 	(*current_line)++;
@@ -114,12 +127,16 @@ char *get_next_token(char **current_line, HashMap *jack_tokens){
 	return token;
     }
 
+    //check char by char, if a token is encountered return current strings
+    //and continue where the pointer is left at.
     while(**current_line != '\0' && **current_line != ' '){
 
 	//map implementation works with strings instead of chars.
 	char single_char_str[2] = {**current_line, '\0'};
 
+	//token encountered
 	if(has_key(jack_tokens, single_char_str)){
+	    //return token not empty? null term and return
 	    if(len > 0){
 		token[len] = '\0';
 		return token;

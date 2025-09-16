@@ -17,6 +17,7 @@ typedef enum {
 } TokenType;
 
 FILE *open_file(char *filename);
+FILE *generate_token_output_file();
 HashMap *generate_token_hashmap();
 
 int has_next_line(FILE *file);
