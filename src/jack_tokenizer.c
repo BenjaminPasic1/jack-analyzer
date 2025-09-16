@@ -17,6 +17,56 @@ FILE *open_file(char *filename){
     return file;
 }
 
+
+HashMap *generate_token_hashmap() {
+    HashMap *map = create_hashmap(HASHMAP_SIZE);
+
+    // Keywords
+    insert_hashmap(map, "class", "class");
+    insert_hashmap(map, "constructor", "constructor");
+    insert_hashmap(map, "function", "function");
+    insert_hashmap(map, "method", "method");
+    insert_hashmap(map, "int", "int");
+    insert_hashmap(map, "boolean", "boolean");
+    insert_hashmap(map, "char", "char");
+    insert_hashmap(map, "void", "void");
+    insert_hashmap(map, "var", "var");
+    insert_hashmap(map, "static", "static");
+    insert_hashmap(map, "field", "field");
+    insert_hashmap(map, "let", "let");
+    insert_hashmap(map, "do", "do");
+    insert_hashmap(map, "if", "if");
+    insert_hashmap(map, "else", "else");
+    insert_hashmap(map, "while", "while");
+    insert_hashmap(map, "return", "return");
+    insert_hashmap(map, "true", "true");
+    insert_hashmap(map, "false", "false");
+    insert_hashmap(map, "null", "null");
+    insert_hashmap(map, "this", "this");
+
+    // Symbols
+    insert_hashmap(map, "{", "{");
+    insert_hashmap(map, "}", "}");
+    insert_hashmap(map, "(", "(");
+    insert_hashmap(map, ")", ")");
+    insert_hashmap(map, "[", "[");
+    insert_hashmap(map, "]", "]");
+    insert_hashmap(map, ".", ".");
+    insert_hashmap(map, ",", ",");
+    insert_hashmap(map, ";", ";");
+    insert_hashmap(map, "+", "+");
+    insert_hashmap(map, "-", "-");
+    insert_hashmap(map, "*", "*");
+    insert_hashmap(map, "/", "/");
+    insert_hashmap(map, "&", "&");
+    insert_hashmap(map, "|", "|");
+    insert_hashmap(map, "<", "<");
+    insert_hashmap(map, ">", ">");
+    insert_hashmap(map, "=", "=");
+
+    return map;
+}
+
 int has_next_line(FILE *file){
     int ch = fgetc(file);        
 
@@ -37,15 +87,56 @@ int has_next_token(char **current_line){
     return 1;
 }
 
-char *get_next_token(char **current_line){
-    char *token = calloc(MAX_TOKEN_SIZE);
+char *get_next_token(char **current_line, HashMap *jack_tokens){
+    char *token = calloc(MAX_TOKEN_SIZE, sizeof(char));
+    int len = 0;
 
-    while(**current_line != '\0'){
-	if()
+    //if there are multiple spaces, or the pointer is left on a space -> skip
+    while(**current_line == ' ')
+	(*current_line)++;
 
-	*current_line++;
+    if(**current_line == '"'){
+	token[len++] = **current_line;
+	(*current_line)++;
+
+	while(**current_line != '"' && **current_line != '\0'){
+	    token[len++] = **current_line;
+	    (*current_line)++;
+	}
+	
+	//include closing quote
+	if(**current_line == '"'){
+	    token[len++] = **current_line;
+	    (*current_line)++;
+	}
+
+	token[len] = '\0';
+	return token;
+    }
+
+    while(**current_line != '\0' && **current_line != ' '){
+
+	//map implementation works with strings instead of chars.
+	char single_char_str[2] = {**current_line, '\0'};
+
+	if(has_key(jack_tokens, single_char_str)){
+	    if(len > 0){
+		token[len] = '\0';
+		return token;
+	    }
+
+	    token[0] = **current_line;
+	    token[1] = '\0';
+	    (*current_line)++;
+	    return token;
+	}
+
+	token[len++] = **current_line;
+	(*current_line)++;
     }
     
+    token[len] = '\0';
+    return token;
 }
 
 char *get_next_line(FILE *file){
@@ -77,16 +168,4 @@ void trim(char *line){
     memmove(line, start, len);
     line[len] = '\0';
 }
-
-// TokenType get_token_type(char * token){
-//     //Check first character
-//     //If it's a number -> not identifier, symbol, keyword, string constant
-// 		    // -> then see if there are any more numbers left to grab
-//     //If it's length of 1 -> check if it's a symbol otherwise it must be a single letter identifier or number
-// 			//-> but we check if it's a number before this
-//     //If it's not a number, or single length then it's a string, keyword or multiletter identifier
-// 			//->first check if it's a string by the " sign, if not check keywords otherwise it's an identifier
-//     return;
-// }
-
 

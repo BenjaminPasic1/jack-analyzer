@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "./hashmap.h"
+#include "../include/hashmap.h"
 
 HashMap *create_hashmap(int capacity){
     HashMap *map = malloc(sizeof(HashMap));
