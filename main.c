@@ -12,7 +12,7 @@ int main(){
 	//for line, since we will manipulate it and lose the initial reference
 	char *line_start = line;
 
-	if(*line == '\0'){
+	if(*line == '\0' || *line == '/'){
 	    free(line);
 	    continue;
 	}

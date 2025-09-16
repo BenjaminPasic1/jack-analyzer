@@ -38,46 +38,25 @@ int has_next_token(char **current_line){
 }
 
 char *get_next_token(char **current_line){
-    char *start, *end;
-    size_t len;
+    char *token = calloc(MAX_TOKEN_SIZE);
 
-    start = *current_line;
+    while(**current_line != '\0'){
+	if()
 
-    while(**current_line && !isspace((unsigned char)**current_line)){
-	(*current_line)++;
+	*current_line++;
     }
     
-    end = *current_line;
-    len = end - start; 
-
-    char *token = malloc(len + 1);
-    if(!token){
-	perror("ERROR: Failed to allocate memory for token.");
-	exit(EXIT_FAILURE);
-    }
-
-    memcpy(token, start, len);
-    token[len] = '\0';
-    
-    //At this point, if we are mid line current_line points to an empty space,
-    //Here we skip any remaning spaces between tokens.
-    while(**current_line && isspace((unsigned char)**current_line)){
-	(*current_line)++;
-    }
-
-
-    return token;
 }
 
 char *get_next_line(FILE *file){
-    char *line = malloc(MAX_BUFFER_SIZE);
+    char *line = malloc(MAX_LINE_SIZE);
     
     if(!line){
 	perror("ERROR: Failed to allocate memory for line string.");
 	exit(EXIT_FAILURE);
     }
 
-    fgets(line, MAX_BUFFER_SIZE, file);
+    fgets(line, MAX_LINE_SIZE, file);
 
     trim(line);
 
@@ -98,5 +77,16 @@ void trim(char *line){
     memmove(line, start, len);
     line[len] = '\0';
 }
+
+// TokenType get_token_type(char * token){
+//     //Check first character
+//     //If it's a number -> not identifier, symbol, keyword, string constant
+// 		    // -> then see if there are any more numbers left to grab
+//     //If it's length of 1 -> check if it's a symbol otherwise it must be a single letter identifier or number
+// 			//-> but we check if it's a number before this
+//     //If it's not a number, or single length then it's a string, keyword or multiletter identifier
+// 			//->first check if it's a string by the " sign, if not check keywords otherwise it's an identifier
+//     return;
+// }
 
 
