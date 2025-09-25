@@ -9,14 +9,21 @@
 #define HASHMAP_SIZE 1024
 
 typedef enum {
-    KEYWORD,
-    SYMBOL,
-    INT_CONSTANT,
-    STR_CONSTANT,
-    IDENTIFIER,
+  KEYWORD,
+  SYMBOL,
+  INT_CONSTANT,
+  STR_CONSTANT,
+  IDENTIFIER,
 } TokenType;
 
+typedef struct {
+  char *token;
+  TokenType type;
+} Token;
+
 FILE *open_file(char *filename);
+void write_token_to_output(Token *token, FILE *output_file);
+
 FILE *generate_token_output_file();
 HashMap *generate_token_hashmap();
 
@@ -26,8 +33,9 @@ char *get_next_line(FILE *file);
 
 int has_next_token(char **current_line);
 char *get_next_token(char **current_line, HashMap *jack_tokens);
-TokenType get_token_type(char * token);
+Token *get_token_details(HashMap *map, char *token);
 
 void trim(char *current_line);
+int is_integer(char *token);
 
 #endif
