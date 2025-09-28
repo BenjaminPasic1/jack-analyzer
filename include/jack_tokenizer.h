@@ -24,7 +24,7 @@ typedef struct {
 FILE *open_file(char *filename);
 void write_token_to_output(Token *token, FILE *output_file);
 
-FILE *generate_token_output_file();
+FILE *create_output_file(char *filename);
 HashMap *generate_token_hashmap();
 
 int has_next_line(FILE *file);
@@ -37,5 +37,7 @@ Token *get_token_details(HashMap *map, char *token);
 
 void trim(char *current_line);
 int is_integer(char *token);
+
+FILE *tokenize_to_xml(FILE *input_file, HashMap *jack_tokens);
 
 #endif

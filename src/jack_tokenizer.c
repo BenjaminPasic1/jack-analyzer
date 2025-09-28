@@ -17,17 +17,49 @@ FILE *open_file(char *filename) {
   return file;
 }
 
-FILE *generate_token_output_file() {
-  FILE *out_file = fopen("token_output.xml", "w");
+FILE *create_output_file(char *filename) {
+  FILE *out_file = fopen(filename, "w");
 
   if (out_file == NULL) {
     perror("ERROR: Error creating token outut file! Exiting...\n");
     exit(EXIT_FAILURE);
   }
 
-  fprintf(out_file, "<tokens>\n");
-
   return out_file;
+}
+
+FILE *tokenize_to_xml(FILE *source_file, HashMap *jack_tokens) {
+  FILE *output_file = create_output_file("tokens_output.xml");
+
+  fprintf(output_file, "<tokens>\n");
+
+  while (has_next_line(source_file)) {
+    char *line = get_next_line(source_file);
+
+    // Keep track of the beginning of the assigned memory
+    // for line, since we will manipulate it and lose the initial reference
+    char *line_start = line;
+
+    if (*line == '\0' || *line == '/') {
+      free(line);
+      continue;
+    }
+
+    while (has_next_token(&line)) {
+      char *token = get_next_token(&line, jack_tokens);
+      Token *token_details = get_token_details(jack_tokens, token);
+      write_token_to_output(token_details, output_file);
+
+      free(token);
+      free(token_details);
+    }
+
+    free(line_start);
+  }
+
+  fprintf(output_file, "</tokens>");
+
+  return output_file;
 }
 
 HashMap *generate_token_hashmap() {
