@@ -60,10 +60,11 @@ void compile_class_var_dec(FILE *output_file, FILE *token_xml) {
 
   peek_line(token_xml);
   while (!check_for_match(buffer, "constructor", TOKEN_VALUE)) {
+    fprintf(output_file, "<classVarDec>\n");
     compile_var_dec(output_file, token_xml);
+    fprintf(output_file, "</classVarDec>\n");
+    peek_line(token_xml);
   }
-
-  fprintf(output_file, "</classVarDec>");
 }
 
 void compile_var_dec(FILE *output_file, FILE *token_xml) {
@@ -88,9 +89,23 @@ void compile_var_dec(FILE *output_file, FILE *token_xml) {
   eat_any(var_types_keywords, var_types_size, token_xml);
   fprintf(output_file, "%s\n", buffer);
 
-  // two ways to define following var names:
-  // static int x,y OR static int x
-  // Find a way to determine if it's x or , up next
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  // after static int x for example, it can be the end of the statement
+  // or it can be a comma where we want to define another variable of the same
+  // kind and type
+
+  peek_line(token_xml);
+  while (check_for_match(buffer, ",", TOKEN_VALUE)) {
+    eat(",", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+    peek_line(token_xml);
+  }
+
+  eat(";", token_xml, TOKEN_VALUE);
 }
 
 void eat(char *expected, FILE *token_xml, MatchMode mode) {
@@ -151,7 +166,8 @@ int check_for_match(char *current, char *expected, MatchMode mode) {
   return (strlen(expected) == len && strncmp(start, expected, len) == 0);
 }
 
-// Place next line into buffer, but return pointer back so it's not incremented.
+// Place next line into buffer, but return file pointer back so it's not
+// incremented.
 void peek_line(FILE *file) {
   long pos = ftell(file);
 
