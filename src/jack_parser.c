@@ -4,7 +4,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define RETURN_TYPES_KEYWORDS_SIZE 5
+#define VAR_KIND_KEYWORDS_SIZE 2
+#define SUBROUTINE_KIND_KEYWORDS_SIZE 3
+
 static char buffer[MAX_TOKEN_LINE_SIZE];
+static ExpectedToken return_types_keywords[] = {{"int", TOKEN_VALUE},
+                                                {"char", TOKEN_VALUE},
+                                                {"boolean", TOKEN_VALUE},
+                                                {"identifier", TOKEN_TYPE},
+                                                {"void", TOKEN_VALUE}};
+
+static ExpectedToken var_kind_keywords[] = {{"static", TOKEN_VALUE},
+                                            {"field", TOKEN_VALUE}};
+
+static ExpectedToken subroutine_kind_keywords[] = {{"constructor", TOKEN_VALUE},
+                                                   {"function", TOKEN_VALUE},
+                                                   {"method", TOKEN_VALUE}};
 
 FILE *parse_to_xml() {
   FILE *token_xml = fopen("tokens_output.xml", "r");
@@ -41,10 +57,139 @@ void compile_class_subroutine_dec(FILE *output_file, FILE *token_xml) {
       !check_for_match(buffer, "method", TOKEN_VALUE))
     return;
 
-  char *possible_keywords[] = {"constructor", "function", "method"};
+  peek_line(token_xml);
+  while (!check_for_match(buffer, "}", TOKEN_VALUE)) {
+    fprintf(output_file, "<subroutineDec>\n");
+    compile_subroutine_dec(output_file, token_xml);
+    fprintf(output_file, "</subroutineDec>\n");
+  }
+}
+
+void compile_subroutine_dec(FILE *output_file, FILE *token_xml) {
+  // Check kind of subrutine
+  eat_any(subroutine_kind_keywords, SUBROUTINE_KIND_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+  // Check type of subroutine
+  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+  // Check for function name (identifier)
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  // Opening
+  eat("(", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  // Everything checks out, then look through the parameter list.
+  compile_parameter_list(output_file, token_xml);
+
+  // Closing
+  eat(")", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_subroutine_body(output_file, token_xml);
+}
+
+void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<subroutineBody>\n");
+
+  // Beginning of function body
+  eat("{", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
 
   peek_line(token_xml);
   while (!check_for_match(buffer, "}", TOKEN_VALUE)) {
+
+    if (check_for_match(buffer, "var", TOKEN_VALUE)) {
+      compile_var_declaration(output_file, token_xml);
+    } else if (check_for_match(buffer, "let", TOKEN_VALUE)) {
+
+    } else if (check_for_match(buffer, "do", TOKEN_VALUE)) {
+
+    } else if (check_for_match(buffer, "while", TOKEN_VALUE)) {
+
+    } else if (check_for_match(buffer, "return", TOKEN_VALUE)) {
+    }
+  }
+
+  fprintf(output_file, "<subroutineBody>\n");
+}
+
+void compile_let_statement(FILE *output_file, FILE *token_xml) {}
+
+void compile_var_declaration(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<varDec>\n");
+
+  eat("var", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  // If it's an array declaration
+  peek_line(token_xml);
+  if (check_for_match(buffer, "[", TOKEN_VALUE)) {
+    eat("[", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+
+    eat("integerConstant", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+
+    eat("]", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+  } else if (check_for_match(buffer, ",", TOKEN_VALUE)) {
+    peek_line(token_xml);
+    while (!check_for_match(buffer, ";", TOKEN_VALUE)) {
+
+      eat(",", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      eat("identifier", token_xml, TOKEN_TYPE);
+      fprintf(output_file, "%s\n", buffer);
+
+      peek_line(token_xml);
+    }
+  }
+
+  eat(";", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+  fprintf(output_file, "</varDec>\n");
+}
+
+void compile_parameter_list(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<parameterList>\n");
+
+  // If the next token is a closing parantheses, no parameters in the function
+  peek_line(token_xml);
+  if (check_for_match(buffer, ")", TOKEN_VALUE)) {
+    fprintf(output_file, "</parameterList>\n");
+    return;
+  }
+
+  // Used for adding commas, if it's the first iteration no need for ,
+  int first_loop = 1;
+
+  peek_line(token_xml);
+  while (!check_for_match(buffer, ")", TOKEN_VALUE)) {
+
+    if (!first_loop) {
+      eat(",", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    }
+
+    eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+    // parameter type
+    fprintf(output_file, "%s\n", buffer);
+    // parameter name
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+    peek_line(token_xml);
+
+    first_loop = 0;
+    peek_line(token_xml);
   }
 }
 
@@ -68,25 +213,12 @@ void compile_class_var_dec(FILE *output_file, FILE *token_xml) {
 }
 
 void compile_var_dec(FILE *output_file, FILE *token_xml) {
-  ExpectedToken var_kind_keywords[] = {{"static", TOKEN_VALUE},
-                                       {"field", TOKEN_VALUE}};
-  size_t var_kind_size =
-      sizeof(var_kind_keywords) / sizeof(var_kind_keywords[0]);
-
-  ExpectedToken var_types_keywords[] = {{"int", TOKEN_VALUE},
-                                        {"char", TOKEN_VALUE},
-                                        {"boolean", TOKEN_VALUE},
-                                        {"identifier", TOKEN_TYPE}};
-
-  size_t var_types_size =
-      sizeof(var_types_keywords) / sizeof(var_types_keywords[0]);
-
   // is it static or field? proceed
-  eat_any(var_kind_keywords, var_kind_size, token_xml);
+  eat_any(var_kind_keywords, VAR_KIND_KEYWORDS_SIZE, token_xml);
   fprintf(output_file, "%s\n", buffer);
 
   // matches any of the allowed data types? proceed.
-  eat_any(var_types_keywords, var_types_size, token_xml);
+  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
   fprintf(output_file, "%s\n", buffer);
 
   eat("identifier", token_xml, TOKEN_TYPE);
