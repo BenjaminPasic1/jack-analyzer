@@ -7,7 +7,8 @@
 #define RETURN_TYPES_KEYWORDS_SIZE 5
 #define VAR_KIND_KEYWORDS_SIZE 2
 #define SUBROUTINE_KIND_KEYWORDS_SIZE 3
-#define EXPRESSION_SYMBOLS_SIZE 10
+#define UNARY_OPERATOR_KEYWORDS_SIZE 2
+#define EXPRESSION_SYMBOLS_SIZE 9
 
 static char buffer[MAX_TOKEN_LINE_SIZE];
 static ExpectedToken return_types_keywords[] = {{"int", TOKEN_VALUE},
@@ -23,10 +24,13 @@ static ExpectedToken subroutine_kind_keywords[] = {{"constructor", TOKEN_VALUE},
                                                    {"function", TOKEN_VALUE},
                                                    {"method", TOKEN_VALUE}};
 
-static ExpectedToken term_keywords[] = {
-    {"integerConstant", TOKEN_TYPE}, {"stringConstant", TOKEN_TYPE},
-    {"true", TOKEN_VALUE}, {"false", TOKEN_VALUE}, {"null", TOKEN_VALUE},
-    {"this", TOKEN_VALUE}, {"identifier", TOKEN_TYPE};
+static ExpectedToken unary_operator_keywords[] = {{"-", TOKEN_VALUE},
+                                                  {"~", TOKEN_VALUE}};
+
+static ExpectedToken expression_symbols[] = {
+    {"+", TOKEN_VALUE}, {"-", TOKEN_VALUE}, {"*", TOKEN_VALUE},
+    {"/", TOKEN_VALUE}, {"&", TOKEN_VALUE}, {"|", TOKEN_VALUE},
+    {"<", TOKEN_VALUE}, {">", TOKEN_VALUE}, {"=", TOKEN_VALUE}};
 
 FILE *parse_to_xml() {
   FILE *token_xml = fopen("tokens_output.xml", "r");
@@ -143,25 +147,37 @@ void compile_let_statement(FILE *output_file, FILE *token_xml) {
 }
 
 void compile_expression(FILE *output_file, FILE *token_xml) {
-  // Rekurzivno moras uraditi ovaj dio. SKontaj 1!!!!
-  fprintf(output_file, "<expression>\n");
+  fprintf(output_file, "<expression>");
+
+  // term (op term)
 
   compile_term(output_file, token_xml);
+
+  peek_line(token_xml);
+
+  if
 }
 
 void compile_term(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<term>");
+
   peek_line(token_xml);
 
-  if (check_for_match(buffer, "(", TOKEN_VALUE)) {
+  if (check_for_match(buffer, "-", TOKEN_VALUE) ||
+      check_for_match(buffer, "~", TOKEN_VALUE)) {
+    eat_any(unary_operator_keywords, UNARY_OPERATOR_KEYWORDS_SIZE, token_xml);
+    fprintf(output_file, "%s\n", buffer);
+
+    compile_term(output_file, token_xml);
+  } else if (check_for_match(buffer, "(", TOKEN_VALUE)) {
     eat("(", token_xml, TOKEN_VALUE);
     fprintf(output_file, "%s\n", buffer);
 
     compile_expression(output_file, token_xml);
-
     eat(")", token_xml, TOKEN_VALUE);
-    fprintf(output_file, "%s\n", buffer);
-    return;
   }
+
+  fprintf(output_file, "</term>");
 }
 
 void compile_var_declaration(FILE *output_file, FILE *token_xml) {
@@ -306,17 +322,31 @@ void eat_any(ExpectedToken *expected, size_t size, FILE *token_xml) {
     exit(EXIT_FAILURE);
   }
 
-  int ok = 0;
+  int match_found = 0;
   for (int i = 0; i < size; i++) {
-    if (check_for_match(buffer, expected[i].keyword, expected[i].mode))
-      ok = 1;
+    if (check_for_match(buffer, expected[i].keyword, expected[i].mode)) {
+      match_found = 1;
+      break;
+    }
   }
 
-  if (!ok) {
+  if (!match_found) {
     perror("Issues in eat_any, none of the expected options match the buffer. "
            "EXITING...\n");
     exit(EXIT_FAILURE);
   }
+}
+
+int is_symbol(char *current) {
+  int match_found = 0;
+
+  for (int i = 0; i < EXPRESSION_SYMBOLS_SIZE; i++) {
+    if (strncmp(current, expression_symbols[i].keyword, 1) == 0) {
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 int check_for_match(char *current, char *expected, MatchMode mode) {
