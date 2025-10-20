@@ -40,6 +40,8 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml);
 // Compile Statements
 void compile_var_declaration(FILE *output_file, FILE *token_xml);
 void compile_let_statement(FILE *output_file, FILE *token_xml);
+void compile_expression(FILE *output_file, FILE *token_xml);
+void compile_term(FILE *output_file, FILE *token_xml);
 
 int check_for_match(char *buffer, char *expected, MatchMode mode);
 void peek_line(FILE *file);

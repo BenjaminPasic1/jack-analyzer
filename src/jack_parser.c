@@ -7,6 +7,7 @@
 #define RETURN_TYPES_KEYWORDS_SIZE 5
 #define VAR_KIND_KEYWORDS_SIZE 2
 #define SUBROUTINE_KIND_KEYWORDS_SIZE 3
+#define EXPRESSION_SYMBOLS_SIZE 10
 
 static char buffer[MAX_TOKEN_LINE_SIZE];
 static ExpectedToken return_types_keywords[] = {{"int", TOKEN_VALUE},
@@ -21,6 +22,11 @@ static ExpectedToken var_kind_keywords[] = {{"static", TOKEN_VALUE},
 static ExpectedToken subroutine_kind_keywords[] = {{"constructor", TOKEN_VALUE},
                                                    {"function", TOKEN_VALUE},
                                                    {"method", TOKEN_VALUE}};
+
+static ExpectedToken term_keywords[] = {
+    {"integerConstant", TOKEN_TYPE}, {"stringConstant", TOKEN_TYPE},
+    {"true", TOKEN_VALUE}, {"false", TOKEN_VALUE}, {"null", TOKEN_VALUE},
+    {"this", TOKEN_VALUE}, {"identifier", TOKEN_TYPE};
 
 FILE *parse_to_xml() {
   FILE *token_xml = fopen("tokens_output.xml", "r");
@@ -115,7 +121,48 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
   fprintf(output_file, "<subroutineBody>\n");
 }
 
-void compile_let_statement(FILE *output_file, FILE *token_xml) {}
+void compile_let_statement(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<letStatement>\n");
+
+  eat("let", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  peek_line(token_xml);
+  if (check_for_match(buffer, "[", TOKEN_VALUE)) {
+    eat("[", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+
+    compile_expression(output_file, token_xml);
+
+    eat("]", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+  }
+}
+
+void compile_expression(FILE *output_file, FILE *token_xml) {
+  // Rekurzivno moras uraditi ovaj dio. SKontaj 1!!!!
+  fprintf(output_file, "<expression>\n");
+
+  compile_term(output_file, token_xml);
+}
+
+void compile_term(FILE *output_file, FILE *token_xml) {
+  peek_line(token_xml);
+
+  if (check_for_match(buffer, "(", TOKEN_VALUE)) {
+    eat("(", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+
+    compile_expression(output_file, token_xml);
+
+    eat(")", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+    return;
+  }
+}
 
 void compile_var_declaration(FILE *output_file, FILE *token_xml) {
   fprintf(output_file, "<varDec>\n");
