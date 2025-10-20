@@ -45,5 +45,6 @@ void compile_term(FILE *output_file, FILE *token_xml);
 
 int check_for_match(char *buffer, char *expected, MatchMode mode);
 void peek_line(FILE *file);
+int is_symbol(char *current);
 
 #endif

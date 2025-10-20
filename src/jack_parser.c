@@ -154,8 +154,15 @@ void compile_expression(FILE *output_file, FILE *token_xml) {
   compile_term(output_file, token_xml);
 
   peek_line(token_xml);
+  while (is_symbol(buffer)) {
+    eat_any(expression_symbols, EXPRESSION_SYMBOLS_SIZE, token_xml);
+    fprintf(output_file, "%s\n", buffer);
 
-  if
+    compile_term(output_file, token_xml);
+    peek_line(token_xml);
+  }
+
+  fprintf(output_file, "</expression>");
 }
 
 void compile_term(FILE *output_file, FILE *token_xml) {
