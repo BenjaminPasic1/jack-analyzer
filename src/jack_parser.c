@@ -109,6 +109,11 @@ void compile_var_dec(FILE *output_file, FILE *token_xml) {
 // Var declerations subroutine level
 void compile_subroutine_var_dec(FILE *output_file, FILE *token_xml) {
 
+  peek_line(token_xml);
+  if (!check_for_match(buffer, "var", TOKEN_VALUE)) {
+    return;
+  }
+
   fprintf(output_file, "<varDec>\n");
 
   eat("var", token_xml, TOKEN_VALUE);
@@ -232,22 +237,112 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
   eat("{", token_xml, TOKEN_VALUE);
   fprintf(output_file, "%s\n", buffer);
 
+  compile_subroutine_var_dec(output_file, token_xml);
+
+  compile_statements(output_file, token_xml);
+
+  fprintf(output_file, "</subroutineBody>\n");
+}
+
+void compile_statements(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<statements>\n");
+
   peek_line(token_xml);
   while (!check_for_match(buffer, "}", TOKEN_VALUE)) {
 
-    if (check_for_match(buffer, "var", TOKEN_VALUE)) {
-      compile_subroutine_var_dec(output_file, token_xml);
-    } else if (check_for_match(buffer, "let", TOKEN_VALUE)) {
+    if (check_for_match(buffer, "let", TOKEN_VALUE)) {
       compile_let_statement(output_file, token_xml);
     } else if (check_for_match(buffer, "do", TOKEN_VALUE)) {
-
+      compile_do_statement(output_file, token_xml);
     } else if (check_for_match(buffer, "while", TOKEN_VALUE)) {
-
+      compile_while_statement(output_file, token_xml);
     } else if (check_for_match(buffer, "return", TOKEN_VALUE)) {
+      compile_return_statement(output_file, token_xml);
+    } else if (check_for_match(buffer, "if", TOKEN_VALUE)) {
+      compile_if_statement(output_file, token_xml);
     }
   }
+  fprintf(output_file, "</statements>\n");
+}
 
-  fprintf(output_file, "<subroutineBody>\n");
+void compile_if_statement(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<ifStatement>\n");
+
+  eat("if", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("(", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_expression(output_file, token_xml);
+
+  eat(")", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("{", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_statements(output_file, token_xml);
+
+  eat("}", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  peek_line(token_xml);
+  if (check_for_match(buffer, "else", TOKEN_VALUE)) {
+    eat("else", token_xml, TOKEN_VALUE);
+
+    eat("{", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+
+    compile_statements(output_file, token_xml);
+
+    eat("}", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+  }
+
+  fprintf(output_file, "</ifStatement>\n");
+}
+
+void compile_return_statement(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<returnStatement>\n");
+
+  eat("return", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  peek_line(token_xml);
+  if (!check_for_match(buffer, ";", TOKEN_VALUE)) {
+    compile_expression(output_file, token_xml);
+  }
+
+  eat(";", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  fprintf(output_file, "</returnStatement>\n");
+}
+
+void compile_while_statement(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<whileStatement>\n");
+
+  eat("while", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("(", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_expression(output_file, token_xml);
+
+  eat(")", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("{", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_statements(output_file, token_xml);
+
+  eat("}", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  fprintf(output_file, "</whileStatement>\n");
 }
 
 void compile_do_statement(FILE *output_file, FILE *token_xml) {

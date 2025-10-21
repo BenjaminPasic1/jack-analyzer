@@ -38,9 +38,13 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml);
 void compile_class_subroutine_dec(FILE *output_file, FILE *token_xml);
 
 // Compile Statements
+void compile_statements(FILE *output_file, FILE *token_xml);
 void compile_subroutine_var_dec(FILE *output_file, FILE *token_xml);
 void compile_let_statement(FILE *output_file, FILE *token_xml);
 void compile_do_statement(FILE *output_file, FILE *token_xml);
+void compile_while_statement(FILE *output_file, FILE *token_xml);
+void compile_return_statement(FILE *output_file, FILE *token_xml);
+void compile_if_statement(FILE *output_file, FILE *token_xml);
 void compile_expression(FILE *output_file, FILE *token_xml);
 void compile_term(FILE *output_file, FILE *token_xml);
 
