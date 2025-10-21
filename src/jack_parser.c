@@ -44,9 +44,10 @@ FILE *parse_to_xml() {
   return output_file;
 }
 
-void compile_class(FILE *output_file, FILE *token_xml) {
-  eat("class", token_xml, TOKEN_VALUE);
+void compile_class(FILE *output_file, FILE *token_xml) { // class Something {}
   fprintf(output_file, "<class>\n");
+
+  eat("class", token_xml, TOKEN_VALUE);
   fprintf(output_file, "%s\n", buffer);
   eat("identifier", token_xml, TOKEN_TYPE);
   fprintf(output_file, "%s\n", buffer);
@@ -55,11 +56,99 @@ void compile_class(FILE *output_file, FILE *token_xml) {
 
   compile_class_var_dec(output_file, token_xml);
   compile_class_subroutine_dec(output_file, token_xml);
+
+  fprintf(output_file, "</class>\n");
+}
+
+// Var declerations class level
+void compile_class_var_dec(FILE *output_file,
+                           FILE *token_xml) { // static/field int num
+  // fields are optional, so i should check if there are any first
+  // if not, i should just return
+  peek_line(token_xml);
+  if (!check_for_match(buffer, "static", TOKEN_VALUE) &&
+      !check_for_match(buffer, "field", TOKEN_VALUE))
+    return;
+
+  while (!check_for_match(buffer, "constructor", TOKEN_VALUE)) {
+    fprintf(output_file, "<classVarDec>\n");
+    compile_var_dec(output_file, token_xml);
+    fprintf(output_file, "</classVarDec>\n");
+    peek_line(token_xml);
+  }
+}
+
+void compile_var_dec(FILE *output_file, FILE *token_xml) {
+  // is it static or field? proceed
+  eat_any(var_kind_keywords, VAR_KIND_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+
+  // matches any of the allowed data types? proceed.
+  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  // after static int x for example, it can be the end of the statement
+  // or it can be a comma where we want to define another variable of the same
+  // kind and type
+
+  peek_line(token_xml);
+  while (check_for_match(buffer, ",", TOKEN_VALUE)) {
+    eat(",", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+    peek_line(token_xml);
+  }
+
+  eat(";", token_xml, TOKEN_VALUE);
+}
+
+// Var declerations subroutine level
+void compile_subroutine_var_dec(FILE *output_file, FILE *token_xml) {
+
+  fprintf(output_file, "<varDec>\n");
+
+  eat("var", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+  fprintf(output_file, "%s\n", buffer);
+
+  while (1) {
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+
+    peek_line(token_xml);
+    if (check_for_match(buffer, "[", TOKEN_VALUE)) {
+      eat("[", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      eat("integerConstant", token_xml, TOKEN_TYPE);
+      fprintf(output_file, "%s\n", buffer);
+
+      eat("]", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+      peek_line(token_xml);
+    }
+
+    if (check_for_match(buffer, ",", TOKEN_VALUE)) {
+      eat(",", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    } else {
+      break;
+    }
+  }
+
+  eat(";", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  fprintf(output_file, "</varDec>\n");
 }
 
 void compile_class_subroutine_dec(FILE *output_file, FILE *token_xml) {
-  // Class can only have fields & constructor. So check if there are any
-  // subroutines first.
 
   peek_line(token_xml);
   if (!check_for_match(buffer, "constructor", TOKEN_VALUE) &&
@@ -100,6 +189,42 @@ void compile_subroutine_dec(FILE *output_file, FILE *token_xml) {
   compile_subroutine_body(output_file, token_xml);
 }
 
+void compile_parameter_list(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<parameterList>\n");
+
+  // If the next token is a closing parantheses, no parameters in the function
+  peek_line(token_xml);
+  if (check_for_match(buffer, ")", TOKEN_VALUE)) {
+    fprintf(output_file, "</parameterList>\n");
+    return;
+  }
+
+  // Used for adding commas, if it's the first iteration no need for ,
+  int first_loop = 1;
+
+  while (!check_for_match(buffer, ")", TOKEN_VALUE)) {
+
+    if (!first_loop) {
+      eat(",", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    }
+
+    eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
+    // parameter type
+    fprintf(output_file, "%s\n", buffer);
+
+    // parameter name
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+    peek_line(token_xml);
+
+    first_loop = 0;
+    peek_line(token_xml);
+  }
+
+  fprintf(output_file, "</parameterList>\n");
+}
+
 void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
   fprintf(output_file, "<subroutineBody>\n");
 
@@ -111,9 +236,9 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
   while (!check_for_match(buffer, "}", TOKEN_VALUE)) {
 
     if (check_for_match(buffer, "var", TOKEN_VALUE)) {
-      compile_var_declaration(output_file, token_xml);
+      compile_subroutine_var_dec(output_file, token_xml);
     } else if (check_for_match(buffer, "let", TOKEN_VALUE)) {
-
+      compile_let_statement(output_file, token_xml);
     } else if (check_for_match(buffer, "do", TOKEN_VALUE)) {
 
     } else if (check_for_match(buffer, "while", TOKEN_VALUE)) {
@@ -123,6 +248,38 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
   }
 
   fprintf(output_file, "<subroutineBody>\n");
+}
+
+void compile_do_statement(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<doStatement>\n");
+
+  eat("do", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat("identifier", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  peek_line(token_xml);
+  if (check_for_match(buffer, ".", TOKEN_VALUE)) {
+    eat(".", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+  }
+
+  eat("(", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_expression(output_file, token_xml);
+
+  eat(")", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  eat(";", token_xml, TOKEN_TYPE);
+  fprintf(output_file, "%s\n", buffer);
+
+  fprintf(output_file, "</doStatement>\n");
 }
 
 void compile_let_statement(FILE *output_file, FILE *token_xml) {
@@ -144,6 +301,16 @@ void compile_let_statement(FILE *output_file, FILE *token_xml) {
     eat("]", token_xml, TOKEN_VALUE);
     fprintf(output_file, "%s\n", buffer);
   }
+
+  eat("=", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  compile_expression(output_file, token_xml);
+
+  eat(";", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
+  fprintf(output_file, "</letStatement>\n");
 }
 
 void compile_expression(FILE *output_file, FILE *token_xml) {
@@ -231,7 +398,8 @@ void compile_term(FILE *output_file, FILE *token_xml) {
                                TOKEN_TYPE)) { // String constants
       eat("stringConstant", token_xml, TOKEN_TYPE);
       fprintf(output_file, "%s\n", buffer);
-    } else if (check_for_match(buffer, "keyword", TOKEN_TYPE)) {
+    } else if (check_for_match(buffer, "keyword",
+                               TOKEN_TYPE)) { // handle keywords used in terms.
       if (check_for_match(buffer, "true", TOKEN_VALUE) ||
           check_for_match(buffer, "false", TOKEN_VALUE) ||
           check_for_match(buffer, "null", TOKEN_VALUE) ||
@@ -243,129 +411,6 @@ void compile_term(FILE *output_file, FILE *token_xml) {
   }
 
   fprintf(output_file, "</term>");
-}
-
-void compile_var_declaration(FILE *output_file, FILE *token_xml) {
-  fprintf(output_file, "<varDec>\n");
-
-  eat("var", token_xml, TOKEN_VALUE);
-  fprintf(output_file, "%s\n", buffer);
-
-  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
-  fprintf(output_file, "%s\n", buffer);
-
-  eat("identifier", token_xml, TOKEN_TYPE);
-  fprintf(output_file, "%s\n", buffer);
-
-  // If it's an array declaration
-  peek_line(token_xml);
-  if (check_for_match(buffer, "[", TOKEN_VALUE)) {
-    eat("[", token_xml, TOKEN_VALUE);
-    fprintf(output_file, "%s\n", buffer);
-
-    eat("integerConstant", token_xml, TOKEN_TYPE);
-    fprintf(output_file, "%s\n", buffer);
-
-    eat("]", token_xml, TOKEN_VALUE);
-    fprintf(output_file, "%s\n", buffer);
-  } else if (check_for_match(buffer, ",", TOKEN_VALUE)) {
-    peek_line(token_xml);
-    while (!check_for_match(buffer, ";", TOKEN_VALUE)) {
-
-      eat(",", token_xml, TOKEN_VALUE);
-      fprintf(output_file, "%s\n", buffer);
-
-      eat("identifier", token_xml, TOKEN_TYPE);
-      fprintf(output_file, "%s\n", buffer);
-
-      peek_line(token_xml);
-    }
-  }
-
-  eat(";", token_xml, TOKEN_VALUE);
-  fprintf(output_file, "%s\n", buffer);
-  fprintf(output_file, "</varDec>\n");
-}
-
-void compile_parameter_list(FILE *output_file, FILE *token_xml) {
-  fprintf(output_file, "<parameterList>\n");
-
-  // If the next token is a closing parantheses, no parameters in the function
-  peek_line(token_xml);
-  if (check_for_match(buffer, ")", TOKEN_VALUE)) {
-    fprintf(output_file, "</parameterList>\n");
-    return;
-  }
-
-  // Used for adding commas, if it's the first iteration no need for ,
-  int first_loop = 1;
-
-  peek_line(token_xml);
-  while (!check_for_match(buffer, ")", TOKEN_VALUE)) {
-
-    if (!first_loop) {
-      eat(",", token_xml, TOKEN_VALUE);
-      fprintf(output_file, "%s\n", buffer);
-    }
-
-    eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
-    // parameter type
-    fprintf(output_file, "%s\n", buffer);
-    // parameter name
-    eat("identifier", token_xml, TOKEN_TYPE);
-    fprintf(output_file, "%s\n", buffer);
-    peek_line(token_xml);
-
-    first_loop = 0;
-    peek_line(token_xml);
-  }
-}
-
-void compile_class_var_dec(FILE *output_file, FILE *token_xml) {
-  // fields are optional, so i should check if there are any first
-  // if not, i should just return
-  peek_line(token_xml);
-  if (!check_for_match(buffer, "static", TOKEN_VALUE) &&
-      !check_for_match(buffer, "field", TOKEN_VALUE))
-    return;
-
-  fprintf(output_file, "<classVarDec>\n");
-
-  peek_line(token_xml);
-  while (!check_for_match(buffer, "constructor", TOKEN_VALUE)) {
-    fprintf(output_file, "<classVarDec>\n");
-    compile_var_dec(output_file, token_xml);
-    fprintf(output_file, "</classVarDec>\n");
-    peek_line(token_xml);
-  }
-}
-
-void compile_var_dec(FILE *output_file, FILE *token_xml) {
-  // is it static or field? proceed
-  eat_any(var_kind_keywords, VAR_KIND_KEYWORDS_SIZE, token_xml);
-  fprintf(output_file, "%s\n", buffer);
-
-  // matches any of the allowed data types? proceed.
-  eat_any(return_types_keywords, RETURN_TYPES_KEYWORDS_SIZE, token_xml);
-  fprintf(output_file, "%s\n", buffer);
-
-  eat("identifier", token_xml, TOKEN_TYPE);
-  fprintf(output_file, "%s\n", buffer);
-
-  // after static int x for example, it can be the end of the statement
-  // or it can be a comma where we want to define another variable of the same
-  // kind and type
-
-  peek_line(token_xml);
-  while (check_for_match(buffer, ",", TOKEN_VALUE)) {
-    eat(",", token_xml, TOKEN_VALUE);
-    fprintf(output_file, "%s\n", buffer);
-    eat("identifier", token_xml, TOKEN_TYPE);
-    fprintf(output_file, "%s\n", buffer);
-    peek_line(token_xml);
-  }
-
-  eat(";", token_xml, TOKEN_VALUE);
 }
 
 void eat(char *expected, FILE *token_xml, MatchMode mode) {
