@@ -151,13 +151,16 @@ void compile_expression(FILE *output_file, FILE *token_xml) {
 
   // term (op term)
 
+  // term
   compile_term(output_file, token_xml);
 
   peek_line(token_xml);
   while (is_symbol(buffer)) {
+    // op
     eat_any(expression_symbols, EXPRESSION_SYMBOLS_SIZE, token_xml);
     fprintf(output_file, "%s\n", buffer);
 
+    // term
     compile_term(output_file, token_xml);
     peek_line(token_xml);
   }
@@ -171,17 +174,72 @@ void compile_term(FILE *output_file, FILE *token_xml) {
   peek_line(token_xml);
 
   if (check_for_match(buffer, "-", TOKEN_VALUE) ||
-      check_for_match(buffer, "~", TOKEN_VALUE)) {
+      check_for_match(buffer, "~", TOKEN_VALUE)) { // Handle unary ops
     eat_any(unary_operator_keywords, UNARY_OPERATOR_KEYWORDS_SIZE, token_xml);
     fprintf(output_file, "%s\n", buffer);
 
     compile_term(output_file, token_xml);
-  } else if (check_for_match(buffer, "(", TOKEN_VALUE)) {
+  } else if (check_for_match(buffer, "(", TOKEN_VALUE)) { // Handle brackets
     eat("(", token_xml, TOKEN_VALUE);
     fprintf(output_file, "%s\n", buffer);
 
     compile_expression(output_file, token_xml);
     eat(")", token_xml, TOKEN_VALUE);
+  } else if (check_for_match(buffer, "identifier",
+                             TOKEN_TYPE)) { // identifier
+    eat("identifier", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+
+    peek_line(token_xml);
+    if (check_for_match(buffer, "[", TOKEN_VALUE)) { // identifier + array
+                                                     // access
+      eat("[", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      compile_expression(output_file, token_xml);
+
+      eat("]", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    } else if (check_for_match(buffer, "(",
+                               TOKEN_VALUE)) { // Identifier + function call
+      eat("(", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      compile_expression(output_file, token_xml);
+
+      eat(")", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    } else if (check_for_match(buffer, ".", TOKEN_VALUE)) {
+      eat(".", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      eat("identifier", token_xml, TOKEN_TYPE);
+      fprintf(output_file, "%s\n", buffer);
+
+      eat("(", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+
+      compile_expression(output_file, token_xml);
+
+      eat(")", token_xml, TOKEN_VALUE);
+      fprintf(output_file, "%s\n", buffer);
+    } else if (check_for_match(buffer, "integerConstant",
+                               TOKEN_TYPE)) { // Integer Constants
+      eat("integerConstant", token_xml, TOKEN_TYPE);
+      fprintf(output_file, "%s\n", buffer);
+    } else if (check_for_match(buffer, "stringConstant",
+                               TOKEN_TYPE)) { // String constants
+      eat("stringConstant", token_xml, TOKEN_TYPE);
+      fprintf(output_file, "%s\n", buffer);
+    } else if (check_for_match(buffer, "keyword", TOKEN_TYPE)) {
+      if (check_for_match(buffer, "true", TOKEN_VALUE) ||
+          check_for_match(buffer, "false", TOKEN_VALUE) ||
+          check_for_match(buffer, "null", TOKEN_VALUE) ||
+          check_for_match(buffer, "this", TOKEN_VALUE)) {
+        eat("keyword", token_xml, TOKEN_TYPE);
+        fprintf(output_file, "%s\n", buffer);
+      }
+    }
   }
 
   fprintf(output_file, "</term>");
