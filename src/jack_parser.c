@@ -41,6 +41,7 @@ FILE *parse_to_xml() {
     exit(EXIT_FAILURE);
   }
 
+  compile_class(output_file, token_xml);
   return output_file;
 }
 
@@ -241,6 +242,9 @@ void compile_subroutine_body(FILE *output_file, FILE *token_xml) {
 
   compile_statements(output_file, token_xml);
 
+  eat("}", token_xml, TOKEN_VALUE);
+  fprintf(output_file, "%s\n", buffer);
+
   fprintf(output_file, "</subroutineBody>\n");
 }
 
@@ -409,7 +413,7 @@ void compile_let_statement(FILE *output_file, FILE *token_xml) {
 }
 
 void compile_expression(FILE *output_file, FILE *token_xml) {
-  fprintf(output_file, "<expression>");
+  fprintf(output_file, "<expression>\n");
 
   // term (op term)
 
@@ -427,7 +431,7 @@ void compile_expression(FILE *output_file, FILE *token_xml) {
     peek_line(token_xml);
   }
 
-  fprintf(output_file, "</expression>");
+  fprintf(output_file, "</expression>\n");
 }
 
 void compile_term(FILE *output_file, FILE *token_xml) {
@@ -435,8 +439,16 @@ void compile_term(FILE *output_file, FILE *token_xml) {
 
   peek_line(token_xml);
 
-  if (check_for_match(buffer, "-", TOKEN_VALUE) ||
-      check_for_match(buffer, "~", TOKEN_VALUE)) { // Handle unary ops
+  if (check_for_match(buffer, "integerConstant",
+                      TOKEN_TYPE)) { // Integer Constants
+    eat("integerConstant", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+  } else if (check_for_match(buffer, "stringConstant",
+                             TOKEN_TYPE)) { // String constants
+    eat("stringConstant", token_xml, TOKEN_TYPE);
+    fprintf(output_file, "%s\n", buffer);
+  } else if (check_for_match(buffer, "-", TOKEN_VALUE) ||
+             check_for_match(buffer, "~", TOKEN_VALUE)) { // Handle unary ops
     eat_any(unary_operator_keywords, UNARY_OPERATOR_KEYWORDS_SIZE, token_xml);
     fprintf(output_file, "%s\n", buffer);
 
@@ -484,14 +496,6 @@ void compile_term(FILE *output_file, FILE *token_xml) {
       compile_expression(output_file, token_xml);
 
       eat(")", token_xml, TOKEN_VALUE);
-      fprintf(output_file, "%s\n", buffer);
-    } else if (check_for_match(buffer, "integerConstant",
-                               TOKEN_TYPE)) { // Integer Constants
-      eat("integerConstant", token_xml, TOKEN_TYPE);
-      fprintf(output_file, "%s\n", buffer);
-    } else if (check_for_match(buffer, "stringConstant",
-                               TOKEN_TYPE)) { // String constants
-      eat("stringConstant", token_xml, TOKEN_TYPE);
       fprintf(output_file, "%s\n", buffer);
     } else if (check_for_match(buffer, "keyword",
                                TOKEN_TYPE)) { // handle keywords used in terms.
