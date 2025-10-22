@@ -46,6 +46,7 @@ void compile_while_statement(FILE *output_file, FILE *token_xml);
 void compile_return_statement(FILE *output_file, FILE *token_xml);
 void compile_if_statement(FILE *output_file, FILE *token_xml);
 void compile_expression(FILE *output_file, FILE *token_xml);
+void compile_expression_list(FILE *output_file, FILE *token_xml);
 void compile_term(FILE *output_file, FILE *token_xml);
 
 int check_for_match(char *buffer, char *expected, MatchMode mode);

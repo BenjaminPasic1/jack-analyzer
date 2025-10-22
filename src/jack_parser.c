@@ -349,6 +349,29 @@ void compile_while_statement(FILE *output_file, FILE *token_xml) {
   fprintf(output_file, "</whileStatement>\n");
 }
 
+void compile_expression_list(FILE *output_file, FILE *token_xml) {
+  fprintf(output_file, "<expressionList>\n");
+
+  peek_line(token_xml);
+  if (check_for_match(buffer, ")", TOKEN_VALUE)) {
+    fprintf(output_file, "</expressionList>\n");
+    return;
+  }
+
+  compile_expression(output_file, token_xml);
+
+  peek_line(token_xml);
+  while (check_for_match(buffer, ",", TOKEN_VALUE)) {
+    eat(",", token_xml, TOKEN_VALUE);
+    fprintf(output_file, "%s\n", buffer);
+
+    compile_expression(output_file, token_xml);
+    peek_line(token_xml);
+  }
+
+  fprintf(output_file, "</expressionList>\n");
+}
+
 void compile_do_statement(FILE *output_file, FILE *token_xml) {
   fprintf(output_file, "<doStatement>\n");
 
@@ -370,7 +393,7 @@ void compile_do_statement(FILE *output_file, FILE *token_xml) {
   eat("(", token_xml, TOKEN_TYPE);
   fprintf(output_file, "%s\n", buffer);
 
-  compile_expression(output_file, token_xml);
+  compile_expression_list(output_file, token_xml);
 
   eat(")", token_xml, TOKEN_TYPE);
   fprintf(output_file, "%s\n", buffer);
@@ -479,7 +502,7 @@ void compile_term(FILE *output_file, FILE *token_xml) {
       eat("(", token_xml, TOKEN_VALUE);
       fprintf(output_file, "%s\n", buffer);
 
-      compile_expression(output_file, token_xml);
+      compile_expression_list(output_file, token_xml);
 
       eat(")", token_xml, TOKEN_VALUE);
       fprintf(output_file, "%s\n", buffer);
@@ -493,7 +516,7 @@ void compile_term(FILE *output_file, FILE *token_xml) {
       eat("(", token_xml, TOKEN_VALUE);
       fprintf(output_file, "%s\n", buffer);
 
-      compile_expression(output_file, token_xml);
+      compile_expression_list(output_file, token_xml);
 
       eat(")", token_xml, TOKEN_VALUE);
       fprintf(output_file, "%s\n", buffer);
