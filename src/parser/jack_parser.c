@@ -13,7 +13,14 @@ void parse_tokens(FILE *tokens) {
   parsed_xml = fopen("parsed_output.xml", "w");
 
   if (!parsed_xml) {
-    perror("ERROR: Unable to create parsed_xml file. EXITING...");
+    perror("[ERROR]: Unable to create parsed_xml file. EXITING...");
+    exit(EXIT_FAILURE);
+  }
+}
+
+void eat(char *current_token, char *exptected_token) {
+  if (!current_token || !exptected_token) {
+    perror("[ERROR]: ");
     exit(EXIT_FAILURE);
   }
 }

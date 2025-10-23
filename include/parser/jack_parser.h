@@ -6,6 +6,9 @@
 extern FILE *tokens_xml;
 extern FILE *parsed_xml;
 
+typedef enum { DATA, TYPE } ExtractMode;
+
 void parse_tokens(FILE *tokens);
+void eat(char *current_token, char *exptected_token, ExtractMode mode);
 
 #endif
