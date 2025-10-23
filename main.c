@@ -1,4 +1,5 @@
 #include "./include/jack_tokenizer.h"
+#include "./include/parser/jack_parser.h"
 #include "include/hashmap.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +13,6 @@ int main() {
   // OPTIONAL
   // Get all tokens in XML format, used for testing if we get the correct output
   // for tokens
-  FILE *tokens_xml = tokenize_to_xml(source_code, jack_tokens);
-
-  fclose(tokens_xml);
+  tokenize_to_xml(source_code, jack_tokens);
+  parse_tokens();
 }
