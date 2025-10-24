@@ -2,6 +2,7 @@
 #include "../../include/parser/compile_class.h"
 #include "../../include/util.h"
 #include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,24 +43,47 @@ void eat(char *expected_token, ExtractMode mode) {
 
   // Load next line into the global BUFFER
   read_line();
-  char *extracted_val = extract_from_buffer(mode);
+  char *extracted_string = extract_from_buffer(mode);
+
+  printf("[DEBUG] eat -> extracted_string: %s, expected_string: %s\n",
+         extracted_string, expected_token);
 
   // Compare expected and current token
-  if (strcmp(extracted_val, expected_token) != 0) {
-    printf(
-        "[ERROR] -> eat: expected_token: %s does not match extracted_val: %s\n",
-        expected_token, extracted_val);
-    free(extracted_val);
+  if (strcmp(extracted_string, expected_token) != 0) {
+    printf("[ERROR] -> eat: expected_token: %s does not match "
+           "extracted_string: %s\n",
+           expected_token, extracted_string);
+    free(extracted_string);
     fatal_error(
         "Expected value and extracted value do not match. EXITING...\n");
   }
 
-  free(extracted_val);
+  free(extracted_string);
 }
 
 // One keyword can have multiple names. need a way to check multiple possible
 // keywords at a single token.
-void eat_any(char **expected_tokens) {}
+void eat_any(PossibleTokens *tokens, size_t tokens_size) {
+  read_line();
+
+  char *extracted_string = NULL;
+
+  for (int i = 0; i < tokens_size; i++) {
+    extracted_string = extract_from_buffer(tokens[i].mode);
+
+    printf("[DEBUG] eat_any -> extracted_string: %s -- tokens[i]: %s\n",
+           extracted_string, tokens[i].token);
+
+    if (strcmp(extracted_string, tokens[i].token) == 0) {
+      free(extracted_string);
+      return;
+    }
+    free(extracted_string);
+  }
+
+  fatal_error("[ERROR] -> eat_any: None of the possible tokens match the "
+              "current line. Exiting...\n");
+}
 
 void read_line() {
   if (!fgets(buffer, BUFFER_SIZE, tokens_xml))

@@ -1,3 +1,4 @@
+#include "../../include/parser/compile_class_var_dec.h"
 #include "../../include/parser/jack_parser.h"
 #include <stdio.h>
 
@@ -26,6 +27,9 @@ void compile_class() {
 
   eat("{", DATA);
   write_buffer_to_file();
+
+  // Class Variable Declarations function goes here.
+  compile_class_var_dec();
 
   eat("}", DATA);
   write_buffer_to_file();

@@ -5,6 +5,10 @@
 
 <symbol>{</symbol>
 
+<classVarDec>
+<keyword>static</keyword>
+
+</classVarDec>
 <symbol>}</symbol>
 
 </class>

@@ -1,4 +1,5 @@
 // Simple Jack test snippet
 
 class Main {
+  static
 }
