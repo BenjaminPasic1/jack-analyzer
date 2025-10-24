@@ -1,9 +1,11 @@
 #include "../../include/parser/jack_parser.h"
 #include "../../include/parser/compile_class.h"
 #include "../../include/util.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 // Declared as global in .h via extern
 FILE *tokens_xml;
@@ -18,6 +20,8 @@ void parse_tokens() {
     fatal_error("[ERROR] -> parse_tokens: Unable to open tokens_output.xml. "
                 "Exiting...\n");
 
+  rewind(tokens_xml);
+
   // Create a new file for the output
   parsed_xml = fopen("parsed_output.xml", "w");
 
@@ -28,6 +32,7 @@ void parse_tokens() {
 
   compile_class();
   fclose(parsed_xml);
+  fclose(tokens_xml);
 }
 
 // Eat should work as follows: I should read a line inside of eat()
@@ -39,12 +44,12 @@ void eat(char *expected_token, ExtractMode mode) {
 
   // Compare expected and current token
   if (strcmp(extracted_val, expected_token) != 0) {
-    char msg[256];
-    snprintf(msg, sizeof(msg),
-             "[ERROR] -> eat: Expected '%s', got '%s'. EXITING...",
-             expected_token, extracted_val);
+    printf(
+        "[ERROR] -> eat: expected_token: %s does not match extracted_val: %s\n",
+        expected_token, extracted_val);
     free(extracted_val);
-    fatal_error(msg);
+    fatal_error(
+        "Expected value and extracted value do not match. EXITING...\n");
   }
 
   free(extracted_val);

@@ -13,6 +13,8 @@ int main() {
   // OPTIONAL
   // Get all tokens in XML format, used for testing if we get the correct output
   // for tokens
-  tokenize_to_xml(source_code, jack_tokens);
+  FILE *tokens = tokenize_to_xml(source_code, jack_tokens);
+  fclose(tokens);
+
   parse_tokens();
 }
