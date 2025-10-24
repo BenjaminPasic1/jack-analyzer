@@ -3,6 +3,10 @@
 
 //  Initial Version
 //  class Main{
+//    var declarationsclassVarDec:
+//    ('static' | 'field') type varName (',' varName)* ';'
+//
+//    subroutine declarations
 //  }
 
 // Should be able to check if next up is class. If it is proceed. Not? quit.

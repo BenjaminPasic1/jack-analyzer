@@ -39,8 +39,10 @@ void parse_tokens() {
 // Extract either the type of token or the token itself
 // If it matches the expected_token, then it's okay. Otherwise exit.
 void eat(char *expected_token, ExtractMode mode) {
-  // Extract either VALUE or TYPE from the token into global BUFFER
-  char *extracted_val = read_line_and_extract(mode);
+
+  // Load next line into the global BUFFER
+  read_line();
+  char *extracted_val = extract_from_buffer(mode);
 
   // Compare expected and current token
   if (strcmp(extracted_val, expected_token) != 0) {
@@ -55,14 +57,23 @@ void eat(char *expected_token, ExtractMode mode) {
   free(extracted_val);
 }
 
-char *read_line_and_extract(ExtractMode mode) {
-  char *extracted_string = malloc(EXTRACTED_SIZE);
-  if (!extracted_string)
-    fatal_error("[ERROR] -> read_line: Memory allocation failed. EXITING...");
+// One keyword can have multiple names. need a way to check multiple possible
+// keywords at a single token.
+void eat_any(char **expected_tokens) {}
 
+void read_line() {
   if (!fgets(buffer, BUFFER_SIZE, tokens_xml))
     fatal_error(
         "[ERROR] -> read_line: Could not read the next line. EXITING...");
+}
+
+char *extract_from_buffer(ExtractMode mode) {
+  char *extracted_string = malloc(EXTRACTED_SIZE);
+
+  if (!extracted_string) {
+    fatal_error("[ERROR] -> extract_from_buffer: Couldn't allocate memory for "
+                "extracted_string. EXITING...\n");
+  }
 
   char *start, *end;
   int size = 0;
