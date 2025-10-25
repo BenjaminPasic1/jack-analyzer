@@ -3,5 +3,6 @@
 <identifier>Main</identifier>
 <symbol>{</symbol>
 <keyword>static</keyword>
+<keyword>field</keyword>
 <symbol>}</symbol>
 </tokens>

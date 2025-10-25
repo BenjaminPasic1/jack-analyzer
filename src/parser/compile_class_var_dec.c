@@ -14,9 +14,11 @@ void compile_class_var_dec() {
   // Opening Tag
   write_tag_to_file("<classVarDec>");
 
-  // static | field
-  eat_any(var_kind_keyword, var_kind_keyword_size);
-  write_buffer_to_file();
+  while (is_next_any_of(var_kind_keyword, VAR_KIND_SIZE)) {
+    // static | field
+    eat_any(var_kind_keyword, var_kind_keyword_size);
+    write_buffer_to_file();
+  }
 
   // Closing Tag
   write_tag_to_file("</classVarDec>");

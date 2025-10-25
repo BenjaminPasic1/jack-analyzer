@@ -1,7 +1,6 @@
 #include "../../include/parser/jack_parser.h"
 #include "../../include/parser/compile_class.h"
 #include "../../include/util.h"
-#include <cstdio>
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -150,33 +149,31 @@ char *extract_from_buffer(ExtractMode mode) {
 }
 
 int is_next_any_of(PossibleTokens *tokens, size_t tokens_size) {
-  char *extracted_string = peek_next_line(tokens->mode);
 
   for (int i = 0; i < tokens_size; i++) {
-    if (strcmp(extracted_string, tokens->token) == 0) {
+    char *extracted_string = peek_next_line(tokens->mode);
+
+    printf(
+        "[DEBUG] is_next_any_of -> extracted_string: %s, expected_token: %s\n",
+        extracted_string, tokens[i].token);
+
+    if (strcmp(extracted_string, tokens[i].token) == 0) {
       free(extracted_string);
       return 1;
     }
+
+    free(extracted_string);
   }
 
-  free(extracted_string);
-  fatal_error("[ERROR] -> is_next_any_of: None of the expected tokens match "
-              "the extracted token. EXITING...");
+  return 0;
 }
 
 // Peek line and get either the DATA or TYPE
 char *peek_next_line(ExtractMode mode) {
-  char *extracted_string = malloc(EXTRACTED_SIZE);
-
-  if (!extracted_string) {
-    fatal_error("[ERROR] -> peek_next_line: Couldn't allocate memory for "
-                "extracted_string. EXITING...\n");
-  }
-
   long current_position = ftell(tokens_xml);
 
   read_line();
-  extracted_string = extract_from_buffer(mode);
+  char *extracted_string = extract_from_buffer(mode);
 
   fseek(tokens_xml, current_position, SEEK_SET);
 

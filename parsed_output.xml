@@ -8,6 +8,8 @@
 <classVarDec>
 <keyword>static</keyword>
 
+<keyword>field</keyword>
+
 </classVarDec>
 <symbol>}</symbol>
 
