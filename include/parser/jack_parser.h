@@ -31,4 +31,13 @@ char *extract_from_buffer(ExtractMode mode);
 void write_buffer_to_file();
 void write_tag_to_file(char *tag);
 
+// Used to check next line without moving the pointer forwards
+// in the tokens_xml file. Mainly used for loops
+// for example when there's an unknown number of class var decs.
+char *peek_next_line(ExtractMode mode);
+
+// Used to check if the next token we select matches any of the given
+// tokens in the list.
+int is_next_any_of(PossibleTokens *tokens, size_t tokens_size);
+
 #endif

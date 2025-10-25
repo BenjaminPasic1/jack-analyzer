@@ -149,6 +149,19 @@ char *extract_from_buffer(ExtractMode mode) {
   return NULL; // unreachable but silences warnings
 }
 
+int is_next_any_of(PossibleTokens *tokens, size_t tokens_size) {
+  char *extracted_string = peek_next_line(tokens->mode);
+
+  for (int i = 0; i < tokens_size; i++) {
+    if (strcmp(extracted_string, tokens->token) == 0) {
+      return 1;
+    }
+  }
+
+  fatal_error("[ERROR] -> is_next_any_of: None of the expected tokens match "
+              "the extracted token. EXITING...");
+}
+
 // Peek line and get either the DATA or TYPE
 char *peek_next_line(ExtractMode mode) {
   char *extracted_string = malloc(EXTRACTED_SIZE);
