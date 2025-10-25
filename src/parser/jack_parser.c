@@ -154,10 +154,12 @@ int is_next_any_of(PossibleTokens *tokens, size_t tokens_size) {
 
   for (int i = 0; i < tokens_size; i++) {
     if (strcmp(extracted_string, tokens->token) == 0) {
+      free(extracted_string);
       return 1;
     }
   }
 
+  free(extracted_string);
   fatal_error("[ERROR] -> is_next_any_of: None of the expected tokens match "
               "the extracted token. EXITING...");
 }
