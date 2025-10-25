@@ -21,13 +21,13 @@ void parse_tokens();
 void eat(char *exptected_token, ExtractMode mode);
 void eat_any(PossibleTokens *tokens, size_t tokens_size);
 
-char *read_line_and_extract(ExtractMode mode);
-
 void read_line();
-char *extract_from_buffer(ExtractMode mode);
-
 // Skip redundant tokens
 void skip_line();
+
+char *extract_from_buffer(ExtractMode mode);
+
+// Write to files functions
 void write_buffer_to_file();
 void write_tag_to_file(char *tag);
 

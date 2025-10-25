@@ -1,6 +1,7 @@
 #include "../../include/parser/jack_parser.h"
 #include "../../include/parser/compile_class.h"
 #include "../../include/util.h"
+#include <cstdio>
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -146,6 +147,25 @@ char *extract_from_buffer(ExtractMode mode) {
   }
 
   return NULL; // unreachable but silences warnings
+}
+
+// Peek line and get either the DATA or TYPE
+char *peek_next_line(ExtractMode mode) {
+  char *extracted_string = malloc(EXTRACTED_SIZE);
+
+  if (!extracted_string) {
+    fatal_error("[ERROR] -> peek_next_line: Couldn't allocate memory for "
+                "extracted_string. EXITING...\n");
+  }
+
+  long current_position = ftell(tokens_xml);
+
+  read_line();
+  extracted_string = extract_from_buffer(mode);
+
+  fseek(tokens_xml, current_position, SEEK_SET);
+
+  return extracted_string;
 }
 
 void skip_line() {
