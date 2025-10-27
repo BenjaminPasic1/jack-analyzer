@@ -2,6 +2,8 @@
 #include "../../include/parser/jack_parser.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // What's the kind of variable? (static | field)
 PossibleTokens var_kind_keyword[VAR_KIND_SIZE] = {{"static", DATA},
@@ -17,6 +19,38 @@ void compile_class_var_dec() {
   while (is_next_any_of(var_kind_keyword, VAR_KIND_SIZE)) {
     // static | field
     eat_any(var_kind_keyword, var_kind_keyword_size);
+    write_buffer_to_file();
+
+    // type -> int, char, boolean, or user defined className
+    eat_any(var_type_keywords, VAR_TYPE_KEYWORDS_SIZE);
+    write_buffer_to_file();
+
+    // varName
+    eat("identifier", TYPE);
+    write_buffer_to_file();
+
+    // Peek next
+    char *next_token = peek_next_line(DATA);
+
+    printf(
+        "[DEBUG] -> compile_class_var_dec: next_token before while loop: %s\n",
+        next_token);
+
+    // If it's a comma there are more varNames coming up, loop untill ;
+    while (strcmp(",", next_token) == 0) {
+      // Comma
+      eat(",", DATA);
+      write_buffer_to_file();
+
+      // Identifier
+      eat("identifier", TYPE);
+      write_buffer_to_file();
+
+      free(next_token);
+      next_token = peek_next_line(DATA);
+    }
+
+    eat(";", DATA);
     write_buffer_to_file();
   }
 

@@ -13,6 +13,10 @@ FILE *tokens_xml;
 FILE *parsed_xml;
 char buffer[BUFFER_SIZE];
 
+// type → 'int' | 'char' | 'boolean' | className
+PossibleTokens var_type_keywords[VAR_TYPE_KEYWORDS_SIZE] = {
+    {"int", DATA}, {"char", DATA}, {"boolean", DATA}, {"identifier", TYPE}};
+
 void parse_tokens() {
   // Set tokens_xml as global, so no need to pass it everywhere.
   tokens_xml = fopen("tokens_output.xml", "r");

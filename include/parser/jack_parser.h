@@ -5,6 +5,9 @@
 #define BUFFER_SIZE 256
 #define EXTRACTED_SIZE 64
 
+// Sizes for each tokens keywords array
+#define VAR_TYPE_KEYWORDS_SIZE 4
+
 extern FILE *tokens_xml;
 extern FILE *parsed_xml;
 extern char buffer[BUFFER_SIZE];
@@ -14,6 +17,10 @@ typedef struct {
   char *token;
   ExtractMode mode;
 } PossibleTokens;
+
+// Global token keywords used in multiple compile classes.
+// type → 'int' | 'char' | 'boolean' | className
+extern PossibleTokens var_type_keywords[VAR_TYPE_KEYWORDS_SIZE];
 
 void parse_tokens();
 
