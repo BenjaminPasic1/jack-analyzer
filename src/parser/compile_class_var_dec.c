@@ -32,10 +32,6 @@ void compile_class_var_dec() {
     // Peek next
     char *next_token = peek_next_line(DATA);
 
-    printf(
-        "[DEBUG] -> compile_class_var_dec: next_token before while loop: %s\n",
-        next_token);
-
     // If it's a comma there are more varNames coming up, loop untill ;
     while (strcmp(",", next_token) == 0) {
       // Comma
@@ -49,6 +45,8 @@ void compile_class_var_dec() {
       free(next_token);
       next_token = peek_next_line(DATA);
     }
+
+    free(next_token);
 
     eat(";", DATA);
     write_buffer_to_file();
