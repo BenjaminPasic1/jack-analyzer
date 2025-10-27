@@ -7,5 +7,6 @@
 #define SUBROUTINE_RETURN_TYPE_KEYWORDS_SIZE 5
 
 void compile_subroutine_dec();
+void compile_parameter_list();
 
 #endif

@@ -1,4 +1,16 @@
-// Simple Jack test snippet
+class TestClass {
+    // Class variable declarations
+    static int count;
+    field boolean isActive;
+    field int x, y;
 
-class Main {
+    // Subroutines with empty bodies
+    constructor TestClass new(int x, int y) {
+    }
+
+    function void doSomething(char name) {
+    }
+
+    method void reset() {
+    }
 }
