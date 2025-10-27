@@ -1,7 +1,4 @@
 // Simple Jack test snippet
 
 class Main {
-  static int pointCount;
-  field int x, y;
-  field boolean isVisible;
 }

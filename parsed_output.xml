@@ -5,36 +5,6 @@
 
 <symbol>{</symbol>
 
-<classVarDec>
-<keyword>static</keyword>
-
-<keyword>int</keyword>
-
-<identifier>pointCount</identifier>
-
-<symbol>;</symbol>
-
-<keyword>field</keyword>
-
-<keyword>int</keyword>
-
-<identifier>x</identifier>
-
-<symbol>,</symbol>
-
-<identifier>y</identifier>
-
-<symbol>;</symbol>
-
-<keyword>field</keyword>
-
-<keyword>boolean</keyword>
-
-<identifier>isVisible</identifier>
-
-<symbol>;</symbol>
-
-</classVarDec>
 <symbol>}</symbol>
 
 </class>
