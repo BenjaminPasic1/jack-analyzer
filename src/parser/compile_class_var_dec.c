@@ -13,6 +13,16 @@ size_t var_kind_keyword_size =
 
 //    ('static' | 'field') type varName (',' varName)* ';'
 void compile_class_var_dec() {
+
+  // A class can have 0 variable delclarations
+  char *first_token = peek_next_line(DATA);
+  if (strcmp(first_token, "static") != 0 && strcmp(first_token, "field") != 0) {
+    free(first_token);
+    return;
+  }
+
+  free(first_token);
+
   // Opening Tag
   write_tag_to_file("<classVarDec>");
 
