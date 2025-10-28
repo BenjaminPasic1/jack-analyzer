@@ -4,13 +4,19 @@ class TestClass {
     field boolean isActive;
     field int x, y;
 
-    // Subroutines with empty bodies
+    // Constructor with local variables
     constructor TestClass new(int x, int y) {
+        var int i, j;
+        var boolean success;
     }
 
+    // Function with one var declaration
     function void doSomething(char name) {
+        var char c;
+        var int temp;
     }
 
+    // Method with no local vars
     method void reset() {
     }
 }

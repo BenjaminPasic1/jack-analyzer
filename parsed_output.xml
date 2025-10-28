@@ -64,6 +64,32 @@
 
 <symbol>{</symbol>
 
+<subrotuineBody>
+<varDec>
+<keyword>var</keyword>
+
+<keyword>int</keyword>
+
+<identifier>i</identifier>
+
+<symbol>,</symbol>
+
+<identifier>j</identifier>
+
+<symbol>;</symbol>
+
+</varDec>
+<varDec>
+<keyword>var</keyword>
+
+<keyword>boolean</keyword>
+
+<identifier>success</identifier>
+
+<symbol>;</symbol>
+
+</varDec>
+</subrotuineBody>
 <symbol>}</symbol>
 
 </subroutineDec>
@@ -86,6 +112,28 @@
 
 <symbol>{</symbol>
 
+<subrotuineBody>
+<varDec>
+<keyword>var</keyword>
+
+<keyword>char</keyword>
+
+<identifier>c</identifier>
+
+<symbol>;</symbol>
+
+</varDec>
+<varDec>
+<keyword>var</keyword>
+
+<keyword>int</keyword>
+
+<identifier>temp</identifier>
+
+<symbol>;</symbol>
+
+</varDec>
+</subrotuineBody>
 <symbol>}</symbol>
 
 </subroutineDec>
@@ -104,6 +152,8 @@
 
 <symbol>{</symbol>
 
+<subrotuineBody>
+</subrotuineBody>
 <symbol>}</symbol>
 
 </subroutineDec>

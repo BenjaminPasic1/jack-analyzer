@@ -1,4 +1,5 @@
 #include "../../include/parser/compile_subroutine_dec.h"
+#include "../../include/parser/compile_var_dec.h"
 #include "../../include/parser/jack_parser.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,16 +59,26 @@ void compile_subroutine_dec() {
     write_buffer_to_file();
 
     // subrotuineBody Logic will go here
-    //
-    //
-    //
-    //
+    compile_subroutine_body();
 
     eat("}", DATA);
     write_buffer_to_file();
 
     write_tag_to_file("</subroutineDec>");
   }
+}
+
+// subroutineBody:
+// '{' varDec* statements '}'
+void compile_subroutine_body() {
+  // Opening tag
+  write_tag_to_file("<subroutineBody>");
+
+  // Compiles var declarations (if there are any)
+  compile_var_dec();
+
+  // Closing tag
+  write_tag_to_file("</subroutineBody>");
 }
 
 // parameterList:

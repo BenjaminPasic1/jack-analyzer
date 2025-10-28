@@ -8,5 +8,6 @@
 
 void compile_subroutine_dec();
 void compile_parameter_list();
+void compile_subroutine_body();
 
 #endif
