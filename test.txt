@@ -1,33 +1,29 @@
-class TestClass {
-    // Class variable declarations
-    static int count;
-    field boolean isActive;
-    field int x, y;
-    field int[] numbers;
+class Main {
+    function void main() {
+        var int a, b, c;
+        var Array arr;
 
-    // Constructor with local variables
-    constructor TestClass new(int x, int y) {
-        var int i, j, numbers;
-        var boolean success;
-        var int[] testArray;
-    }
+        let a = 5;
+        let b = 10;
+        let c = a + b * (2 + 3);
 
-    // Function with var declarations
-    // let statements
-    // and an if statement
-    function void doSomething(char name) {
-        var char c;
-        var int temp;
+        let arr = Array.new(3);
+        let arr[0] = c;
+        let arr[1] = a + b;
+        let arr[2] = arr[0] + arr[1];
 
-        let c = "H";
-        let temp = 2 + (4 + 3);
-
-        if(4 > 5){
-          do Output.printString("Hello");
+        if (arr[2] > 20) {
+            do Output.printString("Greater than 20");
+        } else {
+            do Output.printString("Less or equal to 20");
         }
-    }
 
-    // Method with no local vars
-    method void reset() {
+        while (a < b) {
+            let a = a + 1;
+            do Output.printInt(a);
+        }
+
+        do Output.printString("Done!");
+        return;
     }
 }

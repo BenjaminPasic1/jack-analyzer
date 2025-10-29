@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-PossibleTokens term_keywords[TERM_KEYWORDS_SIZE] = {
-    {"integerConstant", TYPE}, {"stringConstant", TYPE}, {"identifier", TYPE}};
+PossibleTokens term_keywords[TERM_KEYWORDS_SIZE] = {{"integerConstant", TYPE},
+                                                    {"stringConstant", TYPE}};
 
 PossibleTokens operator_keywords[OPERATOR_KEYWORDS_SIZE] = {
     {"+", DATA}, {"-", DATA},    {"*", DATA},    {"/", DATA}, {"&amp;", DATA},

@@ -1,5 +1,6 @@
 #include "../../include/parser/jack_parser.h"
 #include "../../include/parser/compile_class.h"
+#include "../../include/parser/compile_expression.h"
 #include "../../include/util.h"
 #include <limits.h>
 #include <stddef.h>
@@ -185,32 +186,24 @@ int is_next(char *expected_token, ExtractMode mode) {
 
 // Only check for square brackets.
 void check_for_square_brackets_only() {
-  char *next_token = peek_next_line(DATA);
-
-  if (strcmp(next_token, "[") == 0) {
+  if (is_next("[", DATA)) {
     eat("[", DATA);
     write_buffer_to_file();
 
     eat("]", DATA);
     write_buffer_to_file();
   }
-
-  free(next_token);
 }
 
 // Check for square brackets and for expression inside of the brackets.
 void check_for_brackets_and_expression() {
-  char *next_token = peek_next_line(DATA);
-
-  if (strcmp(next_token, "[") == 0) {
+  if (is_next("[", DATA)) {
     eat("[", DATA);
     write_buffer_to_file();
 
-    free(next_token);
-    next_token = peek_next_line(DATA);
-
-    if (strcmp(next_token, "]") != 0) {
+    if (!is_next("]", DATA)) {
       // Compile expression
+      compile_expression();
     }
 
     eat("]", DATA);

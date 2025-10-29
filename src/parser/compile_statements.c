@@ -38,6 +38,8 @@ void compile_statements() {
       compile_return_statement();
     }
   }
+
+  write_tag_to_file("</statements>");
 }
 
 // returnStatement:

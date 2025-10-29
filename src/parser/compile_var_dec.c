@@ -7,14 +7,12 @@
 void compile_var_dec() {
 
   // Subroutine var declarations are optional
-  char *var_keyword = peek_next_line(DATA);
-  if (strcmp(var_keyword, "var") != 0) {
-    free(var_keyword);
+  if (!is_next("var", DATA)) {
     // No var declarations
     return;
   }
 
-  while (strcmp(var_keyword, "var") == 0) {
+  while (is_next("var", DATA)) {
     write_tag_to_file("<varDec>");
 
     eat("var", DATA);
@@ -28,24 +26,17 @@ void compile_var_dec() {
     eat("identifier", TYPE);
     write_buffer_to_file();
 
-    char *next_line = peek_next_line(DATA);
-    while (strcmp(next_line, ",") == 0) {
+    while (is_next(",", DATA)) {
       eat(",", DATA);
       write_buffer_to_file();
 
       eat("identifier", TYPE);
       write_buffer_to_file();
-
-      free(next_line);
-      next_line = peek_next_line(DATA);
     }
 
     eat(";", DATA);
     write_buffer_to_file();
 
     write_tag_to_file("</varDec>");
-
-    free(var_keyword);
-    var_keyword = peek_next_line(DATA);
   }
 }
