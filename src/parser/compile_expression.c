@@ -8,8 +8,8 @@ PossibleTokens term_keywords[TERM_KEYWORDS_SIZE] = {
     {"integerConstant", TYPE}, {"stringConstant", TYPE}, {"identifier", TYPE}};
 
 PossibleTokens operator_keywords[OPERATOR_KEYWORDS_SIZE] = {
-    {"+", DATA}, {"-", DATA}, {"*", DATA}, {"/", DATA}, {"&", DATA},
-    {"|", DATA}, {"<", DATA}, {">", DATA}, {"=", DATA},
+    {"+", DATA}, {"-", DATA},    {"*", DATA},    {"/", DATA}, {"&amp;", DATA},
+    {"|", DATA}, {"&lt;", DATA}, {"&gt;", DATA}, {"=", DATA},
 };
 
 PossibleTokens constant_keywords[CONSTANT_KEYWORDS_SIZE] = {

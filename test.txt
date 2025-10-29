@@ -12,12 +12,19 @@ class TestClass {
         var int[] testArray;
     }
 
-    // Function with one var declaration
+    // Function with var declarations
+    // let statements
+    // and an if statement
     function void doSomething(char name) {
         var char c;
         var int temp;
 
-        let c = "Hello";
+        let c = "H";
+        let temp = 2 + (4 + 3);
+
+        if(4 > 5){
+          do Output.printString("Hello");
+        }
     }
 
     // Method with no local vars

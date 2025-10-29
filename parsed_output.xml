@@ -184,32 +184,62 @@
 <symbol>;</symbol>
 
 </letStatement>
-</subroutineBody>
-<symbol>}</symbol>
+<letStatement>
+<keyword>let</keyword>
 
-</subroutineDec>
-<subroutineDec>
-<keyword>method</keyword>
+<identifier>temp</identifier>
 
-<keyword>void</keyword>
+<symbol>=</symbol>
 
-<identifier>reset</identifier>
+<expression>
+<term>
+<integerConstant>2</integerConstant>
+
+</term>
+<symbol>+</symbol>
+
+<term>
+<symbol>(</symbol>
+
+<expression>
+<term>
+<integerConstant>4</integerConstant>
+
+</term>
+<symbol>+</symbol>
+
+<term>
+<integerConstant>3</integerConstant>
+
+</term>
+</expression>
+<symbol>)</symbol>
+
+</term>
+</expression>
+<symbol>;</symbol>
+
+</letStatement>
+<ifStatement>
+<keyword>if</keyword>
 
 <symbol>(</symbol>
 
-<parameterList>
-</parameterList>
+<expression>
+<term>
+<integerConstant>4</integerConstant>
+
+</term>
+<symbol>&gt;</symbol>
+
+<term>
+<integerConstant>5</integerConstant>
+
+</term>
+</expression>
 <symbol>)</symbol>
 
 <symbol>{</symbol>
 
-<subroutineBody>
 <statements>
 </statements>
-</subroutineBody>
-<symbol>}</symbol>
-
-</subroutineDec>
-<symbol>}</symbol>
-
-</class>
