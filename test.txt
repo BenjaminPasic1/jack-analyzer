@@ -3,17 +3,21 @@ class TestClass {
     static int count;
     field boolean isActive;
     field int x, y;
+    field int[] numbers;
 
     // Constructor with local variables
     constructor TestClass new(int x, int y) {
-        var int i, j;
+        var int i, j, numbers;
         var boolean success;
+        var int[] testArray;
     }
 
     // Function with one var declaration
     function void doSomething(char name) {
         var char c;
         var int temp;
+
+        let c = "Hello";
     }
 
     // Method with no local vars

@@ -32,6 +32,9 @@ void compile_class_var_dec() {
     eat_any(var_type_keywords, VAR_TYPE_KEYWORDS_SIZE);
     write_buffer_to_file();
 
+    // identifier can be an array declaration as well. -> numbers[]
+    check_for_square_brackets_only();
+
     // varName
     eat("identifier", TYPE);
     write_buffer_to_file();

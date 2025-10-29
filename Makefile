@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g
 TARGET = final.c
-SOURCES = main.c src/jack_tokenizer.c src/hashmap.c src/parser/jack_parser.c src/parser/compile_class.c src/parser/compile_class_var_dec.c src/util.c src/parser/compile_subroutine_dec.c src/parser/compile_var_dec.c
+SOURCES = main.c src/jack_tokenizer.c src/hashmap.c src/parser/jack_parser.c src/parser/compile_class.c src/parser/compile_class_var_dec.c src/util.c src/parser/compile_subroutine_dec.c src/parser/compile_var_dec.c src/parser/compile_statements.c src/parser/compile_expression.c
 OBJECTS = $(SOURCES:.c=.o)
 
 $(TARGET): $(OBJECTS)

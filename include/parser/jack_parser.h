@@ -46,5 +46,11 @@ char *peek_next_line(ExtractMode mode);
 // Used to check if the next token we select matches any of the given
 // tokens in the list.
 int is_next_any_of(PossibleTokens *tokens, size_t tokens_size);
+int is_next(char *token, ExtractMode mode);
+
+// Check for square brackets only
+void check_for_square_brackets_only();
+// Check for square brackets and expression.
+void check_for_brackets_and_expression();
 
 #endif

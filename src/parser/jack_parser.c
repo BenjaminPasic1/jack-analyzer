@@ -172,6 +172,52 @@ int is_next_any_of(PossibleTokens *tokens, size_t tokens_size) {
   return 0;
 }
 
+int is_next(char *expected_token, ExtractMode mode) {
+  char *next_line = peek_next_line(mode);
+  int flag = 0;
+
+  if (strcmp(expected_token, next_line) == 0)
+    flag = 1;
+
+  free(next_line);
+  return flag;
+}
+
+// Only check for square brackets.
+void check_for_square_brackets_only() {
+  char *next_token = peek_next_line(DATA);
+
+  if (strcmp(next_token, "[") == 0) {
+    eat("[", DATA);
+    write_buffer_to_file();
+
+    eat("]", DATA);
+    write_buffer_to_file();
+  }
+
+  free(next_token);
+}
+
+// Check for square brackets and for expression inside of the brackets.
+void check_for_brackets_and_expression() {
+  char *next_token = peek_next_line(DATA);
+
+  if (strcmp(next_token, "[") == 0) {
+    eat("[", DATA);
+    write_buffer_to_file();
+
+    free(next_token);
+    next_token = peek_next_line(DATA);
+
+    if (strcmp(next_token, "]") != 0) {
+      // Compile expression
+    }
+
+    eat("]", DATA);
+    write_buffer_to_file();
+  }
+}
+
 // Peek line and get either the DATA or TYPE
 char *peek_next_line(ExtractMode mode) {
   long current_position = ftell(tokens_xml);

@@ -39,6 +39,20 @@
 <symbol>;</symbol>
 
 </classVarDec>
+<classVarDec>
+<keyword>field</keyword>
+
+<keyword>int</keyword>
+
+<symbol>[</symbol>
+
+<symbol>]</symbol>
+
+<identifier>numbers</identifier>
+
+<symbol>;</symbol>
+
+</classVarDec>
 <subroutineDec>
 <keyword>constructor</keyword>
 
@@ -64,7 +78,7 @@
 
 <symbol>{</symbol>
 
-<subrotuineBody>
+<subroutineBody>
 <varDec>
 <keyword>var</keyword>
 
@@ -75,6 +89,10 @@
 <symbol>,</symbol>
 
 <identifier>j</identifier>
+
+<symbol>,</symbol>
+
+<identifier>numbers</identifier>
 
 <symbol>;</symbol>
 
@@ -89,7 +107,23 @@
 <symbol>;</symbol>
 
 </varDec>
-</subrotuineBody>
+<varDec>
+<keyword>var</keyword>
+
+<keyword>int</keyword>
+
+<symbol>[</symbol>
+
+<symbol>]</symbol>
+
+<identifier>testArray</identifier>
+
+<symbol>;</symbol>
+
+</varDec>
+<statements>
+</statements>
+</subroutineBody>
 <symbol>}</symbol>
 
 </subroutineDec>
@@ -112,7 +146,7 @@
 
 <symbol>{</symbol>
 
-<subrotuineBody>
+<subroutineBody>
 <varDec>
 <keyword>var</keyword>
 
@@ -133,7 +167,24 @@
 <symbol>;</symbol>
 
 </varDec>
-</subrotuineBody>
+<statements>
+<letStatement>
+<keyword>let</keyword>
+
+<identifier>c</identifier>
+
+<symbol>=</symbol>
+
+<expression>
+<term>
+<stringConstant>Hello</stringConstant>
+
+</term>
+</expression>
+<symbol>;</symbol>
+
+</letStatement>
+</subroutineBody>
 <symbol>}</symbol>
 
 </subroutineDec>
@@ -152,8 +203,10 @@
 
 <symbol>{</symbol>
 
-<subrotuineBody>
-</subrotuineBody>
+<subroutineBody>
+<statements>
+</statements>
+</subroutineBody>
 <symbol>}</symbol>
 
 </subroutineDec>

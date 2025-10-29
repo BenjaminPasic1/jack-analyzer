@@ -23,6 +23,8 @@ void compile_var_dec() {
     eat_any(var_type_keywords, VAR_TYPE_KEYWORDS_SIZE);
     write_buffer_to_file();
 
+    check_for_square_brackets_only();
+
     eat("identifier", TYPE);
     write_buffer_to_file();
 

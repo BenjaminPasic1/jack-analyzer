@@ -1,4 +1,5 @@
 #include "../../include/parser/compile_subroutine_dec.h"
+#include "../../include/parser/compile_statements.h"
 #include "../../include/parser/compile_var_dec.h"
 #include "../../include/parser/jack_parser.h"
 #include <stdio.h>
@@ -76,6 +77,9 @@ void compile_subroutine_body() {
 
   // Compiles var declarations (if there are any)
   compile_var_dec();
+
+  // Compile statements inside of the body
+  compile_statements();
 
   // Closing tag
   write_tag_to_file("</subroutineBody>");
